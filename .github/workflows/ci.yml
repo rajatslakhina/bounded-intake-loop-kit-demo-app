@@ -1,0 +1,32 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+  workflow_dispatch:
+
+jobs:
+  build:
+    name: macOS · resolve remote package + build for iOS Simulator
+    runs-on: macos-15
+    steps:
+      - uses: actions/checkout@v4
+
+      # This step is the point of the job: it proves the pinned
+      # XCRemoteSwiftPackageReference genuinely resolves from GitHub on a clean
+      # machine, which is the part a local build with a warm cache cannot show.
+      - name: Resolve Swift package dependencies
+        run: xcodebuild -resolvePackageDependencies -project Demo.xcodeproj -scheme Demo
+
+      # `generic/platform=iOS Simulator` on purpose: pinning to a named device
+      # (e.g. name=iPhone 16,OS=latest) ties the job to whichever simulator
+      # runtimes happen to be installed on that day's runner image, and they are
+      # not guaranteed. A compile-only check needs no device to exist.
+      - name: Build for iOS Simulator
+        run: |
+          xcodebuild build \
+            -project Demo.xcodeproj \
+            -scheme Demo \
+            -destination 'generic/platform=iOS Simulator'
