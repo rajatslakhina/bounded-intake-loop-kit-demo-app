@@ -76,7 +76,7 @@ XCRemoteSwiftPackageReference "bounded-intake-loop-kit"
   requirement   = { kind = upToNextMajorVersion; minimumVersion = 1.0.0; }
 ```
 
-`upToNextMajorVersion` from `1.0.0` resolves the newest 1.x — **v1.1.0** at the time of writing. Pinned to a released version rather than tracking `main`: branch-tracking means every clone and every CI run resolves whatever `main` happened to be that day, which is the wrong default for something a stranger is going to open once.
+`upToNextMajorVersion` from `1.0.0` resolves the newest 1.x release of the library, whichever that currently is. Pinned to a released version rather than tracking `main`: branch-tracking means every clone and every CI run resolves whatever `main` happened to be that day, which is the wrong default for something a stranger is going to open once.
 
 `Demo/DemoApp.swift` is deliberately thin — 22 lines — and it earns its `import BoundedIntakeLoop`: it owns `DemoConfiguration.currencyCode`, the compiled-in product decision that the library takes as a parameter and never assumes. The demo *UI* lives in the library (`IntakeDemoView`) rather than here, because the loop has to be exercisable in CI on a machine with no device model at all; the same five scenarios back the unit tests, the eval harness and this screen, so a screenshot cannot drift away from a passing test.
 
