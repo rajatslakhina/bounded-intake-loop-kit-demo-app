@@ -9,7 +9,7 @@ The app is a single screen with a scenario picker. Tapping a scenario runs the *
 | Scenario | What you watch happen |
 |---|---|
 | **Grounded read** | The model calls OCR and the barcode reader, then emits a record that passes every invariant. Badge: `READ BY MODEL`. |
-| **No model on device** | The model throws. The loop grounds the photo itself and rebuilds the same record from OCR alone. Badge: `DETERMINISTIC FALLBACK` — same data, different confidence. |
+| **No model on device** | The model throws. The loop runs the grounding tools itself — OCR and the barcode reader — and rebuilds the same record from their evidence, with no model in the loop. Badge: `DETERMINISTIC FALLBACK` — same data, different confidence. |
 | **Runaway tool loop** | The model asks for the same tool forever. The tool-call meter stops at **1 of 4** because every repeat is coalesced for free, and the *turn* meter is what fills up and ends the run. |
 | **Hallucinated barcode** | The model keeps emitting a barcode whose check digit is wrong. You can watch validation reject it on every turn in the trace — and then watch the fallback rebuild the record from the barcode the *reader* actually saw, not the one the model claimed. The record ends up byte-identical to scenario 1; only the provenance differs. |
 | **Contract violation** | The model requests a tool that was never registered. That is not retried — the run ends immediately and the deterministic path takes over. |
@@ -18,7 +18,7 @@ The app is a single screen with a scenario picker. Tapping a scenario runs the *
 
 ## Why this matters
 
-A demo of an AI feature usually shows the happy path, because the happy path is the part that demos well. The interesting engineering is all in the other four columns above, and none of it is visible unless you build a surface that shows it: how much budget a run actually spent, which turn the mode ladder was on when the model misbehaved, and whether the record on screen came from the model or from OCR.
+A demo of an AI feature usually shows the happy path, because the happy path is the part that demos well. The interesting engineering is all in the other four columns above, and none of it is visible unless you build a surface that shows it: how much budget a run actually spent, which turn the mode ladder was on when the model misbehaved, and whether the record on screen came from the model or from the grounding tools.
 
 The provenance badge is the whole argument in one UI element. A record read by the model and a record rebuilt by the fallback can be byte-identical — scenario 1 and scenario 4 produce exactly the same `IntakeRecord` — and a product that displays them the same way has quietly decided that "the model said so" and "arithmetic said so" are the same kind of fact.
 
